@@ -11,7 +11,7 @@ import sys
 import time
 from collections import Counter
 from pathlib import Path
-from typing import Any, Callable, Optional, Sequence, Union
+from typing import Any, Callable, Optional, Sequence, Union, Dict, Tuple, List
 
 import datasets
 import numpy as np
@@ -25,7 +25,7 @@ from . import constants
 
 # don't load from utils to avoid unnecessary dependencies
 AnyPath = Union[str, os.PathLike, pathlib.Path]
-AnyData = Union[Sequence[dict[str, Any]], pd.DataFrame, datasets.Dataset]
+AnyData = Union[Sequence[Dict[str, Any]], pd.DataFrame, datasets.Dataset]
 DUMMY_EXAMPLE = dict(instruction="1+1=", output_1="2", input="", output_2="3")
 
 
@@ -78,7 +78,7 @@ def random_derangement(arr, max_loop=10, seed=None):
     return arr[list(rng.choice(deranged_order))]
 
 
-def _find_first_match(text: str, outputs_to_match: dict[str, Any]) -> tuple[Any, Any]:
+def _find_first_match(text: str, outputs_to_match: Dict[str, Any]) -> Tuple[Any, Any]:
     """Given text to parse and a dictionary of compiled regex to match, return the first match and corresponding key."""
     first_match = None
     first_key = None
@@ -96,7 +96,7 @@ def make_prompts(
     df: pd.DataFrame,
     template: str,
     batch_size: int = 1,
-) -> tuple[list[str], pd.DataFrame]:
+) -> Tuple[List[str], pd.DataFrame]:
     r"""Helper function to make batch prompts for a single template.
 
     Parameters
@@ -112,7 +112,7 @@ def make_prompts(
 
     Returns
     -------
-    prompts : list[str]
+    prompts : List[str]
         List of formatted prompts.
 
     df_out : pd.DataFrame
@@ -157,7 +157,7 @@ def make_prompts(
 
 
 def convert_ordinal_to_binary_preference(
-    preferences: Union[pd.DataFrame, list[dict[str, Any]]],
+    preferences: Union[pd.DataFrame, List[Dict[str, Any]]],
     ordinal_preference_key: str = "preference",
     binary_preference_key: str = "preference",
 ):

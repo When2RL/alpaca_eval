@@ -4,7 +4,7 @@ import logging
 import os
 from functools import partial
 from pathlib import Path
-from typing import Any, Callable, Optional, Sequence, Type, Union
+from typing import Any, Callable, Optional, Sequence, Type, Union, Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -85,7 +85,7 @@ class BaseAnnotator(abc.ABC):
     def __init__(
         self,
         primary_keys: Sequence[str],
-        annotators_config: Union[utils.AnyPath, list[dict[str, Any]]] = constants.DEFAULT_ANNOTATOR_CONFIG,
+        annotators_config: Union[utils.AnyPath, List[Dict[str, Any]]] = constants.DEFAULT_ANNOTATOR_CONFIG,
         seed: Optional[int] = 0,
         is_avoid_reannotations: bool = True,
         other_output_keys_to_keep: Sequence[str] = (
@@ -140,7 +140,7 @@ class BaseAnnotator(abc.ABC):
         return "annotation"
 
     @property
-    def random_seed_keys(self) -> list[str]:
+    def random_seed_keys(self) -> List[str]:
         """What key / column to seed on for the random generator."""
         return list(self.primary_keys)
 
@@ -154,7 +154,7 @@ class BaseAnnotator(abc.ABC):
         to_annotate: utils.AnyData,
         chunksize: Optional[int] = 128,
         **decoding_kwargs,
-    ) -> list[dict[str, Any]]:
+    ) -> List[Dict[str, Any]]:
         """Main function for annotating.
 
         Parameters
@@ -215,7 +215,7 @@ class BaseAnnotator(abc.ABC):
 
         return annotators_config
 
-    def _initialize_annotators(self) -> dict[str, "SingleAnnotator"]:
+    def _initialize_annotators(self) -> Dict[str, "SingleAnnotator"]:
         """Load all the configs and prompts if necessary."""
         annotators_config = utils.load_configs(self.annotators_config)
         try:
@@ -317,7 +317,7 @@ class BaseAnnotator(abc.ABC):
         self,
         df_annotated: pd.DataFrame,
         to_annotate: utils.AnyData,
-    ) -> list[dict[str, Any]]:
+    ) -> List[Dict[str, Any]]:
         """Convert the dataframe into a list of dictionaries to be returned, and store current anntations."""
 
         df_to_annotate = utils.convert_to_dataframe(to_annotate)
@@ -369,7 +369,7 @@ class BaseAnnotator(abc.ABC):
         df_annotated = df_annotated[self._get_all_keys_to_keep(df_annotated.columns)]
         return df_annotated
 
-    def _get_all_keys_to_keep(self, current_columns: Sequence) -> list[str]:
+    def _get_all_keys_to_keep(self, current_columns: Sequence) -> List[str]:
         other_keys_to_keep = [c for c in self.other_keys_to_keep if c in current_columns]
         all_keys_to_keep = self.all_keys + [self.annotation_key] + other_keys_to_keep
         return all_keys_to_keep
@@ -444,7 +444,7 @@ class BaseAnnotator(abc.ABC):
 
         return df_to_annotate
 
-    def _get_other_input_keys_to_keep(self, other_input_keys_to_keep: Sequence[str]) -> list[str]:
+    def _get_other_input_keys_to_keep(self, other_input_keys_to_keep: Sequence[str]) -> List[str]:
         """Get the other input keys to keep, which includes the ones that are needed for the processors."""
         processor_keys_to_keep = []
         for a in self.annotators.values():
@@ -452,7 +452,7 @@ class BaseAnnotator(abc.ABC):
                 processor_keys_to_keep += p.other_input_keys_to_keep
         return list(set(list(other_input_keys_to_keep) + list(processor_keys_to_keep)))
 
-    def _get_other_output_keys_to_keep(self, other_output_keys_to_keep: Sequence[str]) -> list[str]:
+    def _get_other_output_keys_to_keep(self, other_output_keys_to_keep: Sequence[str]) -> List[str]:
         """Get the other output keys to keep, which includes the ones that are needed for the processors."""
         processor_keys_to_keep = []
         for a in self.annotators.values():
@@ -593,16 +593,16 @@ class SingleAnnotator:
         self,
         prompt_template: utils.AnyPath,
         fn_completion_parser: Optional[Union[Callable, str]] = "regex_parser",
-        completion_parser_kwargs: Optional[dict[str, Any]] = None,
+        completion_parser_kwargs: Optional[Dict[str, Any]] = None,
         fn_completions: Union[Callable, str] = "openai_completions",
-        completions_kwargs: Optional[dict[str, Any]] = None,
+        completions_kwargs: Optional[Dict[str, Any]] = None,
         is_shuffle: bool = True,
         seed: Optional[int] = 123,
         batch_size: int = 1,
         base_dir: utils.AnyPath = constants.EVALUATORS_CONFIG_DIR,
         annotation_column: str = "annotation",
         is_store_raw_completions: bool = True,
-        processors_to_kwargs: Optional[dict[str, dict]] = None,
+        processors_to_kwargs: Optional[Dict[str, dict]] = None,
         is_add_default_processors: bool = True,
         completion_key: str = "completions",
     ):
@@ -724,7 +724,7 @@ class SingleAnnotator:
 
     def _make_prompts(
         self, df_to_annotate: pd.DataFrame, prompt_template: Optional[str] = None
-    ) -> tuple[list[str], pd.DataFrame]:
+    ) -> Tuple[List[str], pd.DataFrame]:
         """Make all the prompts for the given examples.
 
         Parameters
@@ -737,7 +737,7 @@ class SingleAnnotator:
 
         Returns
         -------
-        prompts : list[str]
+        prompts : List[str]
             Formatted prompts for the given examples.
 
         df_to_annotate : pd.DataFrame
@@ -758,7 +758,7 @@ class SingleAnnotator:
 
         return df_to_annotate
 
-    def _parse_completions(self, completions: list[str]) -> tuple[list[Any], list[Any]]:
+    def _parse_completions(self, completions: List[str]) -> Tuple[List[Any], List[Any]]:
         """Converts the completions into annotations."""
         all_annotations = []
         all_completions = []

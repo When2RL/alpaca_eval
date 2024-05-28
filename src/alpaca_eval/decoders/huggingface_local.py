@@ -22,7 +22,7 @@ class ListDataset(Dataset):
         return len(self.original_list)
 
     def __getitem__(self, i):
-        return self.original_list[i]
+        return self.original_List[i]
 
 
 def huggingface_local_completions(
@@ -36,7 +36,7 @@ def huggingface_local_completions(
     is_fast_tokenizer: bool = True,
     adapters_name: Optional[str] = None,
     **kwargs,
-) -> dict[str, list]:
+) -> Dict[str, list]:
     """Decode locally using huggingface transformers pipeline.
 
     Parameters

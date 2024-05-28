@@ -7,7 +7,7 @@ Note: not worth to make the changes but all the parsers could have been processo
 
 import abc
 import json
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -282,7 +282,7 @@ class JsonKeysToColumnProcessor(BaseProcessor):
     "referenced_models" to better understand which model names correspond to which outputs in the chain of thought.
     """
 
-    def __init__(self, *args, json_keys_to_keep: list[str], **kwargs):
+    def __init__(self, *args, json_keys_to_keep: List[str], **kwargs):
         self.json_keys_to_keep = json_keys_to_keep
         super().__init__(*args, **kwargs)
 

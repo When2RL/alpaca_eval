@@ -7,7 +7,7 @@ import os
 import random
 import time
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Optional, Sequence, Union
+from typing import Any, Optional, Sequence, Union, Dict, List, Tuple
 
 import numpy as np
 import openai
@@ -32,7 +32,7 @@ def openai_completions(
     batch_size: Optional[int] = None,
     price_per_token: Optional[float] = None,
     **decoding_kwargs,
-) -> dict[str, list]:
+) -> Dict[str, list]:
     r"""Get openai completions for the given prompts. Allows additional parameters such as tokens to avoid and
     tokens to favor.
 
@@ -178,8 +178,32 @@ def openai_completions(
     )
 
 
+def log_openai_usage(usage_stats, completion_tokens, prompt_tokens, model_name):
+    if model_name not in usage_stats:
+        usage_stats[model_name] = dict(completion_tokens=0, prompt_tokens=0, num_requests=0)
+    usage_stats[model_name]['completion_tokens'] += completion_tokens
+    usage_stats[model_name]['prompt_tokens'] += prompt_tokens
+    usage_stats[model_name]['num_requests'] += 1
+    usage_stats[model_name]['total_num_requests'] += 1
+        
+    for model_name, usages_dict in usage_stats.items():
+        num_requests = usages_dict['num_requests']
+        if (num_requests + 1) % 25 == 0:
+            avg_comp_tokens = usages_dict['completion_tokens'] / num_requests
+            avg_prompt_tokens = usages_dict['prompt_tokens'] / num_requests
+            logging.info(
+                f"OpenAI API usage for {model_name}: {avg_comp_tokens}/req completion tokens, "
+                f"{avg_prompt_tokens}/req prompt tokens, {num_requests} requests, "
+                f"total req so far {usages_dict['total_num_requests']}."
+            )
+            usages_dict['completion_tokens'] = 0
+            usages_dict['prompt_tokens'] = 0
+            usages_dict['num_requests'] = 0
+    return
+
+
 def _openai_completion_helper(
-    args: tuple[Sequence[str], int],
+    args: Tuple[Sequence[str], int],
     is_chat: bool,
     sleep_time: int = 2,
     top_p: Optional[float] = 1.0,
@@ -190,10 +214,13 @@ def _openai_completion_helper(
     openai_api_keys: Optional[Sequence[str]] = constants.OPENAI_API_KEYS,
     openai_api_base: Optional[str] = os.getenv("OPENAI_API_BASE") if os.getenv("OPENAI_API_BASE") else openai.base_url,
     ############################
-    client_kwargs: Optional[dict[str, Any]] = None,
+    client_kwargs: Optional[Dict[str, Any]] = None,
     n_retries: Optional[int] = 10,
     **kwargs,
 ):
+    if not getattr(_openai_completion_helper, "usage_stats", False):
+        _openai_completion_helper.usage_stats = {} # key: model name, value: usages
+    
     client_kwargs = client_kwargs or dict()
     prompt_batch, max_tokens = args
     all_clients = utils.get_all_clients(
@@ -225,6 +252,14 @@ def _openai_completion_helper(
         try:
             if is_chat:
                 completion_batch = client.chat.completions.create(messages=prompt_batch[0], **curr_kwargs)
+                # keep track of usage
+                curr_model = curr_kwargs['model']
+                log_openai_usage(
+                    _openai_completion_helper.usage_stats,
+                    completion_tokens=completion_batch.usage.completion_tokens,
+                    prompt_tokens=completion_batch.usage.prompt_tokens,
+                    model_name=curr_model,
+                )
 
                 choices = completion_batch.choices
                 for i, choice in enumerate(choices):
@@ -318,7 +353,7 @@ def _get_price_per_token(model, price_per_token=None):
 
 def _get_backwards_compatible_configs(
     openai_api_keys=[], openai_organization_ids=[None], openai_api_base=None
-) -> list[dict[str, Any]]:
+) -> List[Dict[str, Any]]:
     if isinstance(openai_api_keys, str) or openai_api_keys is None:
         openai_api_keys = [openai_api_keys]
     if isinstance(openai_organization_ids, str) or openai_organization_ids is None:

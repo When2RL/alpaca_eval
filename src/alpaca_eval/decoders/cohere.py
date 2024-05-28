@@ -19,7 +19,7 @@ def cohere_completions(
     model_name="command",
     num_procs: int = 5,
     **decoding_kwargs,
-) -> dict[str, list]:
+) -> Dict[str, list]:
     """Decode with Cohere API.
 
     Parameters

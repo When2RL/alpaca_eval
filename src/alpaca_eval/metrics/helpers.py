@@ -2,6 +2,7 @@ import abc
 import logging
 from dataclasses import dataclass
 from numbers import Number
+from typing import Dict, List, Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -42,7 +43,7 @@ class BaseScoringRule(abc.ABC):
         """Compute the generalized win rate of the prediction."""
         return self.describe_head2head(predictions)["win_rate"]
 
-    def describe_head2head(self, predictions: npt.ArrayLike) -> dict[str, float]:
+    def describe_head2head(self, predictions: npt.ArrayLike) -> Dict[str, float]:
         """Compute the generalized win rate of the prediction."""
         predictions = self.preprocess_predictions(predictions)
         n_draws = self._idcs_draws(predictions).sum()
@@ -77,7 +78,7 @@ class BaseScoringRule(abc.ABC):
         predictions = self.preprocess_predictions(predictions)
         return self._bayes_estimator(predictions)
 
-    def preprocess(self, predictions: npt.ArrayLike, targets: npt.ArrayLike) -> tuple[pd.Series, pd.Series]:
+    def preprocess(self, predictions: npt.ArrayLike, targets: npt.ArrayLike) -> Tuple[pd.Series, pd.Series]:
         """Validate the predictions and targets."""
         predictions = self.preprocess_predictions(predictions)
         targets = self.preprocess_targets(targets)

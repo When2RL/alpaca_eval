@@ -23,7 +23,7 @@ def bedrock_anthropic_completions(
     model_name: str = "anthropic.claude-v1",
     num_procs: int = DEFAULT_NUM_PROCS,
     **decoding_kwargs,
-) -> dict[str, list]:
+) -> Dict[str, list]:
     """Decode with Anthropic API.
 
     Parameters
@@ -86,7 +86,7 @@ def bedrock_anthropic_completions(
 
 
 def _bedrock_anthropic_completion_helper(
-    args: tuple[str, int],
+    args: Tuple[str, int],
     sleep_time: int = 2,
     region: Optional[str] = "us-west-2",
     model_name: str = "anthropic.claude-v1",

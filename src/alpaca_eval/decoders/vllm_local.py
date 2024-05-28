@@ -20,7 +20,7 @@ def vllm_local_completions(
     batch_size: int = 1,
     model_kwargs=None,
     **kwargs,
-) -> dict[str, list]:
+) -> Dict[str, list]:
     """Decode locally using vllm transformers pipeline.
 
     Parameters

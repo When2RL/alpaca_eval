@@ -68,7 +68,7 @@ setuptools.setup(
         "api": PACKAGES_ALL_API,
         "all": PACKAGES_ALL,
     },
-    python_requires=">=3.10",
+    # python_requires=">=3.10",
     classifiers=[
         "Intended Audience :: Developers",
         "Intended Audience :: Education",

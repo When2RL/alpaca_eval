@@ -141,7 +141,7 @@ def test_annotate_samples(pairwise_annotator):
     def run_all_tests(annotated_list_of_dict):
         # run tests for each row => use dataframe
         assert isinstance(annotated_list_of_dict, list)
-        assert len(annotated_list_of_dict[0]), dict
+        assert len(annotated_list_of_Dict[0]), dict
         df_annotated = pd.DataFrame(annotated_list_of_dict)
         assert (df_annotated["instruction"] == "2+2").all()
         assert df_annotated["output_1"].isin(potential_outputs).all()

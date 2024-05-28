@@ -3,7 +3,7 @@ Main module for analyzing an evaluation benchmark (annotator and data).
 """
 import logging
 from itertools import combinations
-from typing import Callable, Optional, Sequence, Union
+from typing import Callable, Optional, Sequence, Union, Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -249,7 +249,7 @@ class Analyzer:
         annotations_1: pd.DataFrame,
         annotations_2: Union[pd.DataFrame, str] = "gold_crossannotations",
         groupby: Sequence[str] = ("generator",),
-    ) -> dict[str, float]:
+    ) -> Dict[str, float]:
         """Estimate the correlations between different methods.
 
         Parameters
@@ -262,7 +262,7 @@ class Analyzer:
             Annotations to compare rankings with. If "gold_crossannotations" or "gold_annotations" we use the
             corresponding gold annotations.
 
-        groupby: list[str], optional
+        groupby: List[str], optional
             Columns to groupby for computing the leaderboard.
 
         Returns
@@ -325,7 +325,7 @@ class Analyzer:
 
     def get_length_biases(
         self, annotations: Union[pd.DataFrame, str], significant_delta_length: int = 30
-    ) -> dict[str, float]:
+    ) -> Dict[str, float]:
         """Estimate the biases for longer sentences."""
         try:
             df = annotations.drop_duplicates(subset=self.keys).copy()
@@ -365,7 +365,7 @@ class Analyzer:
             percentage_longer=percentage_longer,
         )
 
-    def get_list_biases(self, annotations: Union[pd.DataFrame, str]) -> dict[str, float]:
+    def get_list_biases(self, annotations: Union[pd.DataFrame, str]) -> Dict[str, float]:
         """Estimate the biases for sentences with lists."""
         try:
             df = annotations.drop_duplicates(subset=self.keys).copy()

@@ -19,7 +19,7 @@ def huggingface_api_completions(
     do_sample: bool = False,
     num_procs: int = 1,
     **kwargs,
-) -> dict[str, list]:
+) -> Dict[str, list]:
     """Decode with the API from hugging face hub.
 
     Parameters

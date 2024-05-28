@@ -24,7 +24,7 @@ def anthropic_completions(
     client_function_name: Optional[str] = "messages",  # newer anthropic models
     requires_chatml: bool = True,
     **decoding_kwargs,
-) -> dict[str, list]:
+) -> Dict[str, list]:
     """Decode with Anthropic API.
 
     Parameters
@@ -101,7 +101,7 @@ def anthropic_completions(
 
 
 def _anthropic_completion_helper(
-    args: tuple[str, int],
+    args: Tuple[str, int],
     sleep_time: int = 2,
     anthropic_api_keys: Optional[Sequence[str]] = (constants.ANTHROPIC_API_KEY,),
     temperature: Optional[float] = 0.7,

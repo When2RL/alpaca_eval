@@ -1,8 +1,9 @@
 import logging
 import sys
 from pathlib import Path
-from typing import Any, Callable, Literal, Optional, Sequence, Union
-
+from typing import Any, Callable, Literal, Optional, Sequence, Union, Dict, List, Tuple
+import os
+import pathlib
 import fire
 import pandas as pd
 
@@ -26,12 +27,12 @@ def evaluate(
     current_leaderboard_mode: str = "community",
     is_return_instead_of_print: bool = False,
     fn_metric: Union[str, callable] = "get_length_controlled_winrate" if constants.IS_ALPACA_EVAL_2 else "get_winrate",
-    metric_kwargs: Optional[dict[str, Any]] = None,
+    metric_kwargs: Optional[Dict[str, Any]] = None,
     is_recompute_metrics_only: bool = False,
     sort_by: str = "length_controlled_winrate" if constants.IS_ALPACA_EVAL_2 else "win_rate",
     is_cache_leaderboard: Optional[bool] = None,
     max_instances: Optional[int] = None,
-    annotation_kwargs: Optional[dict[str, Any]] = None,
+    annotation_kwargs: Optional[Dict[str, Any]] = None,
     Annotator=annotators.PairwiseAnnotator,
     **annotator_kwargs,
 ):
@@ -200,7 +201,7 @@ def evaluate(
         is_cache_leaderboard = max_instances is None
 
     if is_cache_leaderboard:
-        if isinstance(precomputed_leaderboard, AnyPath):
+        if isinstance(precomputed_leaderboard, (str, os.PathLike, pathlib.Path)):
             logging.info(f"Saving result to the precomputed leaderboard at {precomputed_leaderboard}")
             df_leaderboard.to_csv(precomputed_leaderboard)
         else:
@@ -611,4 +612,5 @@ def main():
 
 
 if __name__ == "__main__":
-    fire.Fire(ALL_FUNCTIONS)
+    # fire.Fire(ALL_FUNCTIONS)
+    fire.Fire(evaluate)

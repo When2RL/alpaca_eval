@@ -18,7 +18,7 @@ import copy
 import json
 import logging
 import re
-from typing import Any, Literal, Optional, Sequence, Union
+from typing import Any, Literal, Optional, Sequence, Union, Dict, List, Tuple
 
 import numpy as np
 from scipy.special import logsumexp
@@ -36,7 +36,7 @@ __all__ = [
 ]
 
 
-def regex_parser(completion: str, outputs_to_match: dict[Any, Any]) -> list[Any]:
+def regex_parser(completion: str, outputs_to_match: Dict[Any, Any]) -> List[Any]:
     r"""Parse a single batch of completions, by returning a sequence of keys in the order in which outputs_to_match
     was matched.
 
@@ -45,7 +45,7 @@ def regex_parser(completion: str, outputs_to_match: dict[Any, Any]) -> list[Any]
     completion : str
         Completion to parse.
 
-    outputs_to_match : dict[str, Any]
+    outputs_to_match : Dict[str, Any]
         Dictionary of compiled regex to match. Keys are the keys to return in the order in which they are matched.
         The values can be either a compiled regex or a string. If a string, it will be compiled to a regex and that will
         be modified inplace.
@@ -92,7 +92,7 @@ def regex_parser(completion: str, outputs_to_match: dict[Any, Any]) -> list[Any]
 
 # modified from: https://github.com/lm-sys/FastChat/blob/main/fastchat/eval/eval_gpt_review.py#L47
 # does not work with batched completions
-def lmsys_parser(completion: str) -> list[Any]:
+def lmsys_parser(completion: str) -> List[Any]:
     r"""Parse a pair of scores from a single completion and returns which is better.
 
     Examples
@@ -127,7 +127,7 @@ def lmsys_parser(completion: str) -> list[Any]:
         return [np.nan]
 
 
-def ranking_parser(completion: str, model_1_name: str = "model_1") -> list[Any]:
+def ranking_parser(completion: str, model_1_name: str = "model_1") -> List[Any]:
     r"""Parse a completion that contains a list of dictionary and returns the name of the preferred model.
 
     Examples
@@ -157,7 +157,7 @@ def ranking_parser(completion: str, model_1_name: str = "model_1") -> list[Any]:
         return [np.nan]
 
 
-def json_parser(completion: str, annotation_key: Optional[str]) -> list[Any]:
+def json_parser(completion: str, annotation_key: Optional[str]) -> List[Any]:
     r"""Parse the completion by reading it as a JSON and selecting "annotation_key".
 
     Examples
@@ -185,7 +185,7 @@ def json_parser(completion: str, annotation_key: Optional[str]) -> list[Any]:
     return [d[annotation_key] if annotation_key is not None else d for d in json.loads(completion)]
 
 
-def eval_parser(completion: str) -> list[Any]:
+def eval_parser(completion: str) -> List[Any]:
     """Parse the completion by evaluating it.
 
     Examples
@@ -206,7 +206,7 @@ def eval_parser(completion: str) -> list[Any]:
     return evaluated_completion
 
 
-def replace_parser(completion: str, replacer: dict, default_replacer: Any = "auto") -> list[str]:
+def replace_parser(completion: str, replacer: dict, default_replacer: Any = "auto") -> List[str]:
     """Parser that replaces part of the completion using a dictionary. This is useful if it's more natural for a
     prompt to ask a completion that is different from the one you want to store.
 
@@ -239,7 +239,7 @@ def logprob_parser(
     denominator_tokens: Sequence[str],
     is_binarize: bool = True,
     log_prob_index: Union[Literal["batch"], int] = "batch",
-) -> list[float]:
+) -> List[float]:
     """Parser that computes the logprob of a numerator token divided by the sum of the logprobs of the denominator
     tokens.
 
@@ -272,7 +272,7 @@ def logprob_parser(
     assert "logprobs" in completion
     assert "content" in completion["logprobs"]
 
-    def single_logprob_parser(top_logprobs: list[dict[str, Any]]) -> float:
+    def single_logprob_parser(top_logprobs: List[Dict[str, Any]]) -> float:
         map_tokens_to_logprobs = {
             t["token"]: t["logprob"] for t in top_logprobs if t["token"] in denominator_tokens + [numerator_token]
         }
@@ -318,8 +318,8 @@ def logprob_parser(
 
 
 def pipeline_meta_parser(
-    completion: str, parsers_to_kwargs: dict[str, dict], is_squeeze: bool = True, _depth=0
-) -> list[Any]:
+    completion: str, parsers_to_kwargs: Dict[str, dict], is_squeeze: bool = True, _depth=0
+) -> List[Any]:
     r"""Applies a list of parsers in sequence to a completion.
 
     Parameters

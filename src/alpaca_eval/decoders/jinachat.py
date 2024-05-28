@@ -16,7 +16,7 @@ __all__ = ["jina_chat_completions"]
 def jina_chat_completions(
     prompts: Sequence[str],
     num_procs: Optional[int] = 4,
-) -> dict[str, list]:
+) -> Dict[str, list]:
     """Get jina chat completions for the given prompts. Allows additional parameters such as tokens to avoid and
     tokens to favor.
 

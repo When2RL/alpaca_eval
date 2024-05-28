@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Optional, Sequence, Union
+from typing import Optional, Sequence, Union, Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -25,6 +25,10 @@ GLM_INFO = {
         "kwargs": {"n_splits": 5},
     },
 }
+if sklearn.__version__ < "1.4":
+    GLM_INFO["length_controlled_v1"]["kwargs"]["n_splits"] = 0
+    print("Warning: sklearn version is too old, setting n_splits to 0.")
+
 DFLT_WEIGHT_PATH = (
     Path(__file__).parent
     / "weights/weighted_alpaca_eval_gpt4_turbo/length_controlled_v1/baseline_gpt4_1106_preview.csv"
@@ -39,7 +43,7 @@ def get_length_controlled_winrate(
     is_add_glm_preference_inplace: bool = True,
     is_warn_extreme_changes: bool = True,
     glm_info=None,
-) -> dict[str, float]:
+) -> Dict[str, float]:
     """Extract head2head metrics (n_wins, n_counts, win_rate) from a sequence preference, and also predict the length
     controlled winrate using a GLM.
 
@@ -190,7 +194,7 @@ def _logistic(x):
 
 def _get_featurized_data(
     df_annotations: pd.DataFrame, formula: str, regularize_to_baseline_lambda: Optional[float]
-) -> tuple[pd.DataFrame, pd.DataFrame, Optional[pd.Series]]:
+) -> Tuple[pd.DataFrame, pd.DataFrame, Optional[pd.Series]]:
     """Featurizes annotations using R-style formula and returns the design matrix for the train and test set.
 
     Parameters
@@ -249,7 +253,7 @@ def _get_featurized_data(
 
 def make_dmatrix_for_model(
     df_train: pd.DataFrame, df_test: pd.DataFrame, formula: str, col_y_true="preference"
-) -> tuple[pd.DataFrame, pd.DataFrame]:
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Build the design matrix based on a patsy formula.
 
     Parameters

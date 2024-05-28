@@ -1,7 +1,7 @@
 import logging
 from functools import partial
 from pathlib import Path
-from typing import Any, Callable, Optional, Sequence, Type, Union
+from typing import Any, Callable, Optional, Sequence, Type, Union, Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -60,7 +60,7 @@ class PairwiseAnnotatorLocal(BaseAnnotator):
         return "preference"
 
     @property
-    def random_seed_keys(self) -> list[str]:
+    def random_seed_keys(self) -> List[str]:
         return list(self.input_keys)
 
     def annotate_samples(
@@ -71,7 +71,7 @@ class PairwiseAnnotatorLocal(BaseAnnotator):
         p_label_flip: Optional[float] = None,
         is_multisample_list: bool = True,
         **decoding_kwargs,
-    ) -> list[dict[str, Any]]:
+    ) -> List[Dict[str, Any]]:
         """Sample pairs of outputs from a sequence of examples and annotate them.
 
         Parameters
@@ -154,12 +154,12 @@ class PairwiseAnnotatorLocal(BaseAnnotator):
 
     def annotate_head2head(
         self,
-        outputs_1: Union[Sequence[dict[str, Any]], pd.DataFrame],
-        outputs_2: Union[Sequence[dict[str, Any]], pd.DataFrame],
+        outputs_1: Union[Sequence[Dict[str, Any]], pd.DataFrame],
+        outputs_2: Union[Sequence[Dict[str, Any]], pd.DataFrame],
         keys_to_merge: Optional[Sequence[str]] = None,
         is_ordered: bool = False,
         **decoding_kwargs,
-    ) -> list[dict[str, Any]]:
+    ) -> List[Dict[str, Any]]:
         """Head-to-head comparison between two sequence of outputs.
 
         Parameters
@@ -240,9 +240,9 @@ class PairwiseAnnotatorLocal(BaseAnnotator):
 
     def annotate_pairs(
         self,
-        to_annotate: Union[Sequence[dict[str, Any]], pd.DataFrame],
+        to_annotate: Union[Sequence[Dict[str, Any]], pd.DataFrame],
         **decoding_kwargs,
-    ) -> list[dict[str, Any]]:
+    ) -> List[Dict[str, Any]]:
         """Annotates the given examples, which contain both `"output_1"` and `"output_2"` keys.
 
         Parameters
@@ -344,7 +344,7 @@ class SinglePairwiseAnnotator(SingleAnnotator):
         *args,
         annotation_column: str = "preference",
         random_seed_column: Sequence[str] = ("instruction",),
-        processors_to_kwargs: Optional[dict[str, dict]] = None,
+        processors_to_kwargs: Optional[Dict[str, dict]] = None,
         is_randomize_output_order: bool = True,
         **kwargs,
     ):

@@ -20,7 +20,7 @@ def google_completions(
     model_name="gemini-pro",
     num_procs: int = constants.API_MAX_CONCURRENCY,
     **decoding_kwargs,  # ,
-) -> dict[str, list]:
+) -> Dict[str, list]:
     """Decode with Anthropic API.
 
     Parameters
@@ -82,7 +82,7 @@ def google_completions(
 
 
 def _google_completion_helper(
-    args: tuple[str, int],
+    args: Tuple[str, int],
     sleep_time: int = 2,
     temperature: Optional[float] = 0.7,
     model_name: str = "gemini-pro",
