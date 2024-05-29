@@ -123,7 +123,6 @@ def openai_completions(
         if batch_size > 1:
             logging.warning("batch_size > 1 is not supported yet for chat models. Setting to 1")
             batch_size = 1
-
     else:
         num_procs = num_procs or 3
         batch_size = batch_size or 10
@@ -180,7 +179,7 @@ def openai_completions(
 
 def log_openai_usage(usage_stats, completion_tokens, prompt_tokens, model_name):
     if model_name not in usage_stats:
-        usage_stats[model_name] = dict(completion_tokens=0, prompt_tokens=0, num_requests=0)
+        usage_stats[model_name] = dict(completion_tokens=0, prompt_tokens=0, num_requests=0, total_num_requests=0)
     usage_stats[model_name]['completion_tokens'] += completion_tokens
     usage_stats[model_name]['prompt_tokens'] += prompt_tokens
     usage_stats[model_name]['num_requests'] += 1

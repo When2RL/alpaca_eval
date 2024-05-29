@@ -612,5 +612,4 @@ def main():
 
 
 if __name__ == "__main__":
-    # fire.Fire(ALL_FUNCTIONS)
-    fire.Fire(evaluate)
+    fire.Fire(ALL_FUNCTIONS)
